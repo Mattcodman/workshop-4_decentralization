@@ -7,6 +7,18 @@ export type SendMessageBody = {
   destinationUserId: number;
 };
 
+export type Message = {
+  content: string;
+};
+
+
+
+let lastReceivedMessage: Message | null = null;
+let lastSentMessage: Message | null = null;
+
+
+
+
 export async function user(userId: number) {
   const _user = express();
   _user.use(express.json());
@@ -18,6 +30,27 @@ export async function user(userId: number) {
 
 
   });
+
+  _user.post("/message", (req, res) => {
+    res.status(400).send('message sent');
+
+  });
+  // Route pour obtenir le dernier message reçu
+  _user.get("/getLastReceivedMessage", async (req, res) => {
+    // Renvoie le dernier message reçu au format JSON
+    res.status(200).json({ result: lastReceivedMessage });
+  });
+
+  // Route pour obtenir le dernier message envoyé
+  _user.get("/getLastSentMessage", async (req, res) => {
+    // Renvoie le dernier message envoyé au format JSON
+    res.status(200).json({ result: lastSentMessage });
+  });
+
+
+
+
+
 
   const server = _user.listen(BASE_USER_PORT + userId, () => {
     console.log(

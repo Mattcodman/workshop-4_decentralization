@@ -65,19 +65,40 @@ export async function exportPrvKey(
   const exportedKeyBuffer = Buffer.from(exportedKey);
   const base64Key = exportedKeyBuffer.toString("base64");
   return base64Key;
-  // TODO implement this function to return a base64 string version of a private key
+//TODO implement this function to return a base64 string version of a private key
 
 }
+
+//---------------------------------------------------------------------------------------------------
 
 // Import a base64 string public key to its native format
-export async function importPubKey(
-  strKey: string
-): Promise<webcrypto.CryptoKey> {
-  // TODO implement this function to go back from the result of the exportPubKey function to it's native crypto key object
+export async function importPubKey(strKey: string): Promise<CryptoKey> {
+  // Convertir la chaîne base64 en ArrayBuffer
+  const base64String = strKey.replace(/-/g, '+').replace(/_/g, '/'); // Assurer le formatage correct de la chaîne base64
+  const binaryString = window.atob(base64String); // Décoder la chaîne base64 en chaîne binaire
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++)
+  {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
 
-  // remove this
-  return {} as any;
+  // Importer la clé
+  return window.crypto.subtle.importKey(
+      'spki', // Format pour les clés publiques. Utiliser 'pkcs8' pour les clés privées
+      bytes.buffer, // L'ArrayBuffer contenant la clé
+      {
+        name: 'RSA-OAEP', // Ajuster selon l'algorithme de la clé. Exemple: RSA-OAEP, RSASSA-PKCS1-v1_5, ECDSA, ECDH, etc.
+        hash: 'SHA-256', // Ajuster en fonction de l'algorithme de hash utilisé par la clé
+      },
+      true, // Si la clé peut être exportée à nouveau
+      ['encrypt'] // Utilisations possibles de la clé. Ajuster en fonction de l'opération: 'encrypt', 'decrypt', 'sign', 'verify', etc.
+  );
 }
+
+
+
+//----------------------------------------------------------------------------------------------------------------
 
 // Import a base64 string private key to its native format
 export async function importPrvKey(
