@@ -32,7 +32,13 @@ export async function user(userId: number) {
   });
 
   _user.post("/message", (req, res) => {
-    res.status(400).send('message sent');
+    const { message }: { message: string } = req.body;
+    //message= "AZERT";
+
+    // Mettez à jour la variable lastReceivedMessage avec le message reçu
+    lastReceivedMessage = { content: message };
+
+    res.status(200).send('Message received');
 
   });
   // Route pour obtenir le dernier message reçu
