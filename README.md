@@ -1,3 +1,5 @@
+I had a problem with my files, so i had to work on a copied local repository ( unlinked from git) and then paste my work to the original git project to push it
+
 # simple-onion-router-network
 
 Your goal for this exercise is to implement a version of the onion routing protocol we saw in module 5.
