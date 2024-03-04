@@ -1,4 +1,4 @@
-I had a problem with my files, so i had to work on a copied local repository ( unlinked from git) and then paste my work to the original git project to push it
+
 
 # simple-onion-router-network
 
@@ -58,3 +58,6 @@ You are graded out of 20 points based on the unit tests provided in the `__test_
 Note that not all tests are provided so you can secure a number of points but the rest will be graded after you submit the exercise.
 
 This exercise should be completed individually, you are not allowed to reuse code from other students. Any detected instances of copied code will incur a reduction of your grade.
+
+
+I had a problem with my files, so i had to work on a copied local repository ( unlinked from git) and then paste my work to the original git project to push it
