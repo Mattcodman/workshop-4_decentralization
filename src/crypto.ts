@@ -7,7 +7,8 @@ import {randomBytes} from "crypto";
 // #############
 
 // Function to convert ArrayBuffer to Base64 string
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
+function arrayBufferToBase64(buffer: ArrayBuffer): string
+{
   return Buffer.from(buffer).toString("base64");
 }
 
@@ -46,12 +47,13 @@ export async function generateRsaKeyPair(): Promise<GenerateRsaKeyPair> {
   return { publicKey, privateKey };
 }
 
+
+
 // Export a crypto public key to a base64 string format
 export async function exportPubKey(key: webcrypto.CryptoKey): Promise<string> {
-  const exportedKey = await webcrypto.subtle.exportKey("spki", key);
-  const exportedKeyBuffer = Buffer.from(exportedKey);
-  const base64Key = exportedKeyBuffer.toString("base64");
-  return base64Key;
+  const exportedKey = await window.crypto.subtle.exportKey('spki', key);
+  const base64String = arrayBufferToBase64(exportedKey);
+  return base64String;
 }
 
 // Export a crypto private key to a base64 string format
@@ -74,26 +76,25 @@ export async function exportPrvKey(
 // Import a base64 string public key to its native format
 export async function importPubKey(strKey: string): Promise<CryptoKey> {
   // Convertir la chaîne base64 en ArrayBuffer
-  const base64String = strKey.replace(/-/g, '+').replace(/_/g, '/'); // Assurer le formatage correct de la chaîne base64
-  const binaryString = window.atob(base64String); // Décoder la chaîne base64 en chaîne binaire
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++)
-  {
+  const binaryString = atob(strKey);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
 
   // Importer la clé
-  return window.crypto.subtle.importKey(
+  const importedKey = await window.crypto.subtle.importKey(
       'spki', // Format pour les clés publiques. Utiliser 'pkcs8' pour les clés privées
       bytes.buffer, // L'ArrayBuffer contenant la clé
       {
         name: 'RSA-OAEP', // Ajuster selon l'algorithme de la clé. Exemple: RSA-OAEP, RSASSA-PKCS1-v1_5, ECDSA, ECDH, etc.
-        hash: 'SHA-256', // Ajuster en fonction de l'algorithme de hash utilisé par la clé
+        hash: {name: 'SHA-256'}, // Ajuster en fonction de l'algorithme de hash utilisé par la clé
       },
       true, // Si la clé peut être exportée à nouveau
       ['encrypt'] // Utilisations possibles de la clé. Ajuster en fonction de l'opération: 'encrypt', 'decrypt', 'sign', 'verify', etc.
   );
+
+  return importedKey;
 }
 
 

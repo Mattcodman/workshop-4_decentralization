@@ -1,7 +1,8 @@
 import bodyParser from "body-parser";
+//import fetch from 'node-fetch';
 import express from "express";
 import crypto from "crypto";
-import { BASE_ONION_ROUTER_PORT } from "../config";
+import {BASE_ONION_ROUTER_PORT, REGISTRY_PORT} from "../config";
 
 
 
@@ -9,6 +10,8 @@ import { BASE_ONION_ROUTER_PORT } from "../config";
 let lastReceivedEncryptedMessage: string | null = null;
 let lastReceivedDecryptedMessage: string | null = null;
 let lastMessageDestination: number | null = null;
+
+let registeredNodes: number[] = [];
 
 
 // Stockage des noeuds enregistrés
@@ -20,7 +23,7 @@ export async function simpleOnionRouter(nodeId: number) {
   onionRouter.use(bodyParser.json());
   // Stockage des paires de clés privées pour chaque noeud
   const privateKeys: { [key: number]: crypto.KeyObject } = {}
-  console.log(12345)
+
 
 
 
@@ -68,14 +71,30 @@ export async function simpleOnionRouter(nodeId: number) {
   });
 
 
+
+
   // Route pour enregistrer un noeud
   onionRouter.post("/registerNode", (req, res) => {
-    const { nodeId } = req.body;
+    const { nodeId, pubKey } = req.body;
 
-    // Enregistrez le noeud (Vous pouvez implémenter des vérifications supplémentaires si nécessaire)
+    const url = `http://localhost:${REGISTRY_PORT}/registerNode`;
+    const body = JSON.stringify({ nodeId, pubKey });
+    const headers = { 'Content-Type': 'application/json' };
 
-    res.status(201).json({ message: 'Node registered successfully' });
-  });
+    fetch(url, { method: 'POST', body, headers })
+        .then(response => {
+          if (response.ok) {
+            res.status(201).json({ message: 'Node registered successfully' });
+          } else {
+            res.status(500).json({ error: 'Failed to register node' });
+          }
+        })
+        .catch(error => {
+          console.error('Error registering node:', error);
+          res.status(500).json({ error: 'Failed to register node' });
+        });
+
+      });
 
   const registeredNodes: { nodeId: number, pubKey: string }[] = [];
 
@@ -97,5 +116,15 @@ export async function simpleOnionRouter(nodeId: number) {
     );
   });
 
+
+
+
+
   return server;
+
+
+
 }
+
+
+
